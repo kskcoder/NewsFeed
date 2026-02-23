@@ -2,7 +2,7 @@
 //  NewsListView.swift
 //  NewsFeed
 //
-//  Created by Darshana Kamble on 23/02/26.
+//  Created by Tejas Kashid on 23/02/26.
 //
 
 import SwiftUI
