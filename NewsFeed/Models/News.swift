@@ -6,11 +6,9 @@
 //
 import Foundation
 
-struct News: Identifiable, Hashable {
-    let id = UUID()
+struct News: Identifiable, Hashable, Codable {
+    let userId: Int
+    let id: Int
     let title: String
-    let description: String
-    let author: String
-    let content: String
-    var isFavourite: Bool = false
+    let body: String
 }

@@ -18,11 +18,7 @@ struct NewsDetailView: View {
                     .font(.title)
                     .bold()
                 
-                Text("By: \(news.author)")
-                    .font(.subheadline)
-                    .foregroundColor(.secondary)
-                
-                Text(news.content)
+                Text(news.body)
                     .font(.body)
                 
                 Button("Read More") {

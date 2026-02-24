@@ -6,32 +6,62 @@
 //
 import Foundation
 import Combine
+import SwiftUI
 
+@MainActor
 final class NewsViewModel: ObservableObject {
-    @Published var news: [News] = []
-    @Published var selectedNews: News?
-    @Published var showAlert: Bool = false
+    
+    enum ViewState {
+        case idle
+        case loading
+        case loaded([News])
+        case error(String)
+    }
+    
+    @Published var state: ViewState = .idle
+    @Published var searchText: String = ""
+    
+    private var allNews: [News] = []
+    private var cancellables = Set<AnyCancellable>()
+    private let service = NewsService()
     
     init() {
-        loadMockNews()
+        setupSearchText()
     }
     
-    private func loadMockNews() {
-        news = [
-            News(
-                title: "Apple Launches AI Chip",
-                description: "Apple introduced a new AI-optimized chip.",
-                author: "TechCrunch",
-                content: "Full article content goes here..."
-            ),
-            News(
-                title: "SwiftUI 6 Released",
-                description: "Major improvements in performance.",
-                author: "Apple News",
-                content: "Detailed SwiftUI 6 content..."
-            )
-        ]
+    func fetchNews() async {
+        self.state = .loading
+        
+        do {
+            let news = try await service.fetchNews()
+            allNews = news.prefix(20).map{$0}
+            withAnimation {
+                state = .loaded(allNews)
+            }
+        } catch {
+            self.state = .error("Failed to load news")
+        }
     }
     
+    func setupSearchText() {
+        $searchText
+            .debounce(for: .milliseconds(400), scheduler: RunLoop.main)
+            .removeDuplicates()
+            .sink{[weak self] text in
+                self?.filterNews(withText: text)
+            }
+            .store(in: &cancellables)
+    }
+    
+    func filterNews(withText query: String) {
+        guard !query.isEmpty else {
+            state = .loaded(allNews)
+            return
+        }
+        
+        state = .loaded(allNews.filter{
+            $0.title.localizedCaseInsensitiveContains(query)
+        })
+    }
     
 }

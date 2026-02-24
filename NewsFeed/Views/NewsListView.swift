@@ -12,33 +12,51 @@ struct NewsListView: View {
     
     var body: some View {
         NavigationStack {
-            List ($viewModel.news) { $newsItem in
+            contentView
+                .navigationTitle("NewsFeed")
+                .navigationDestination(for: News.self) { news in
+                    NewsDetailView(news: news)
+                }
+                .searchable (text: $viewModel.searchText)
+                .task {
+                    await viewModel.fetchNews()
+                }
+                .refreshable {
+                    await viewModel.fetchNews()
+                }
+        }
+    }
+    
+    @ViewBuilder
+    private var contentView: some View {
+        switch viewModel.state {
+        case .idle:
+            EmptyView()
+        
+        case .loading:
+            ProgressView()
+            
+        case .loaded(let newsList):
+            List (newsList) { newsItem in
                 NavigationLink(value: newsItem) {
-                    NewsRow(news: $newsItem)
+                    NewsRow(news: newsItem)
                 }
             }
-            .navigationTitle("NewsFeed")
             .navigationDestination(for: News.self) { news in
                 NewsDetailView(news: news)
             }
-            .toolbar {
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    Button {
-                        viewModel.showAlert = true
-                    } label: {
-                        Image(systemName: "bell")
+            
+        case .error(let errorMessage):
+            VStack {
+                Text(errorMessage)
+                    .multilineTextAlignment(.center)
+                
+                Button("Retry") {
+                    Task {
+                        await viewModel.fetchNews()
                     }
                 }
             }
-            .alert("Coming Soon",
-                   isPresented: $viewModel.showAlert) {
-                Button("OK", role: .close) {
-//                    viewModel.showAlert = false
-                }
-            } message: {
-                Text("Notification feature is under development")
-            }
         }
-            
     }
 }

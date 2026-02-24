@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct NewsRow: View {
-    @Binding var news: News
+    let news: News
     
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
@@ -17,25 +17,10 @@ struct NewsRow: View {
             Text(news.title)
                 .font(.headline)
             
-            Text(news.description)
+            Text(news.body)
                 .font(.subheadline)
                 .foregroundColor(.gray)
                 .lineLimit(2)
-            
-            HStack {
-                Text(news.author)
-                    .font(.caption)
-                
-                Spacer()
-                
-                Button {
-                    news.isFavourite.toggle()
-                } label : {
-                    Image(systemName: news.isFavourite ? "heart.fill" : "heart")
-                    .foregroundColor(news.isFavourite ? .red : .gray)
-                }
-            }
-            .foregroundColor(.secondary)
         }
         .padding()
     }
