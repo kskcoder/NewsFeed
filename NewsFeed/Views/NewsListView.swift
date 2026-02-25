@@ -14,9 +14,6 @@ struct NewsListView: View {
         NavigationStack {
             contentView
                 .navigationTitle("NewsFeed")
-                .navigationDestination(for: News.self) { news in
-                    NewsDetailView(news: news)
-                }
                 .searchable (text: $viewModel.searchText)
                 .task {
                     await viewModel.fetchNews()
@@ -37,9 +34,24 @@ struct NewsListView: View {
             ProgressView()
             
         case .loaded(let newsList):
-            List (newsList) { newsItem in
-                NavigationLink(value: newsItem) {
-                    NewsRow(news: newsItem)
+            ScrollViewReader { proxy in
+                ScrollView {
+                    Color(.clear)
+                        .foregroundColor(Color.red)
+                        .id("TOP")
+                    
+                    LazyVStack {
+                        ForEach (newsList) { newsItem in
+                            NavigationLink(value: newsItem) {
+                                NewsRow(news: newsItem)
+                                    .id(newsItem.id)
+                            }
+                        }
+                    }
+                    Button("Scroll To Top") {
+                        proxy.scrollTo("TOP", anchor: .top)
+                    }
+                    .buttonStyle(.plain)
                 }
             }
             .navigationDestination(for: News.self) { news in
