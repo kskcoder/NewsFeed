@@ -6,26 +6,27 @@
 //
 
 import SwiftUI
+import SwiftData
 
 struct NewsRow: View {
     let news: News
     @State private var isExpanded: Bool = false
     @ObservedObject var viewModel: NewsViewModel
+    @Query private var favourites: [FavouriteNews]
+    @Environment(\.modelContext) private var context
 
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
-            //            Toggle("Dark Mode ", isOn: $news.isFavourite) // Just an example to use Toggle
-
             HStack {
                 Text(news.title)
                     .modifier(CardTitle())                    
 
                 Spacer()
 
-                let isLiked = viewModel.favouriteIDs.contains(String(news.id))
+                let isLiked = favourites.contains { $0.id == String(news.id) }
                 
                 Button {
-                    viewModel.toggleFavourite(for: news.id)
+                    viewModel.toggleFavourite(for: news.id, favourites: favourites, context: context)
                 } label: {
                     Image(systemName: isLiked ? "heart.fill" : "heart")
                         .foregroundColor(isLiked ? .red : .gray)
