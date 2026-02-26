@@ -10,7 +10,7 @@ import SwiftUI
 struct NewsRow: View {
     let news: News
     @State private var isExpanded: Bool = false
-    @State private var isLiked: Bool = false
+    @ObservedObject var viewModel: NewsViewModel
 
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
@@ -22,8 +22,10 @@ struct NewsRow: View {
 
                 Spacer()
 
+                let isLiked = viewModel.favouriteIDs.contains(String(news.id))
+                
                 Button {
-                    isLiked.toggle()
+                    viewModel.toggleFavourite(for: news.id)
                 } label: {
                     Image(systemName: isLiked ? "heart.fill" : "heart")
                         .foregroundColor(isLiked ? .red : .gray)

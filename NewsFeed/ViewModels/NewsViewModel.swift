@@ -20,6 +20,7 @@ final class NewsViewModel: ObservableObject {
     
     @Published var state: ViewState = .idle
     @Published var searchText: String = ""
+    @Published var favouriteIDs: Set<String> = []
     
     private var allNews: [News] = []
     private var cancellables = Set<AnyCancellable>()
@@ -27,6 +28,7 @@ final class NewsViewModel: ObservableObject {
     
     init() {
         setupSearchText()
+        loadFavourites()
     }
     
     func fetchNews() async {
@@ -64,4 +66,24 @@ final class NewsViewModel: ObservableObject {
         })
     }
     
+    func saveFavourites() {
+        UserDefaults.standard.setValue(Array(favouriteIDs), forKey: "favouriteIDs")
+    }
+    
+    func loadFavourites() {
+        if let saved = UserDefaults.standard.array(forKey: "favouriteIDs") as? [String] {
+            favouriteIDs = Set(saved)
+        }
+    }
+    
+    func toggleFavourite(for id: Int) {
+        let id = String(id)
+        if favouriteIDs.contains(id) {
+            favouriteIDs.remove(id)
+        } else {
+            favouriteIDs.insert(id)
+        }
+        
+        saveFavourites()
+    }
 }

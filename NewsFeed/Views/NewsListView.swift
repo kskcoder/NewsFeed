@@ -43,8 +43,8 @@ struct NewsListView: View {
                     LazyVStack {
                         ForEach (newsList) { newsItem in
                             NavigationLink(value: newsItem) {
-                                NewsRow(news: newsItem)
-                                    .id(newsItem.id)
+                                NewsRow(news: newsItem,
+                                        viewModel: viewModel)
                             }
                         }
                     }
