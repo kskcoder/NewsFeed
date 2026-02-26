@@ -11,4 +11,7 @@ struct News: Identifiable, Hashable, Codable {
     let id: Int
     let title: String
     let body: String
+    var imagePath: String {
+        return "https://picsum.photos/id/\(id)/300/200"
+    }
 }

@@ -9,6 +9,7 @@ import SwiftUI
 
 struct NewsListView: View {
     @StateObject private var viewModel = NewsViewModel()
+    @Environment(\.scenePhase) private var scenePhase
     
     var body: some View {
         NavigationStack {
@@ -20,6 +21,13 @@ struct NewsListView: View {
                 }
                 .refreshable {
                     await viewModel.fetchNews()
+                }
+                .onChange(of: scenePhase) { oldPhase, newPhase in
+                    if (oldPhase == .inactive && newPhase == .active) {
+                        Task {
+//                            await viewModel.fetchNews() //works fine commented to avoid unnecessary api calls
+                        }
+                    }
                 }
         }
     }

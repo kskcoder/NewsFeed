@@ -53,10 +53,10 @@ struct NewsRow: View {
         .cornerRadius(12)
         .shadow(radius: 12)
         //        .animation(.spring, value: isExpanded)
-        .onTapGesture {
-            withAnimation(.spring(response: 1, dampingFraction: 0.8)) {
-                isExpanded.toggle()
-            }
-        }
+//        .onTapGesture {
+//            withAnimation(.spring(response: 1, dampingFraction: 0.8)) {
+//                isExpanded.toggle()
+//            }
+//        }
     }
 }
