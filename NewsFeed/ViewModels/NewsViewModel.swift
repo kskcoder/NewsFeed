@@ -19,14 +19,15 @@ final class NewsViewModel: ObservableObject {
         case error(String)
     }
     
-    @Published var state: ViewState = .idle
+    @Published private(set) var state: ViewState = .idle
     @Published var searchText: String = ""
     
     private var allNews: [News] = []
     private var cancellables = Set<AnyCancellable>()
-    private let service = NewsService()
+    private let service: NewsServiceProtocol
     
-    init() {
+    init(service: NewsServiceProtocol) {
+        self.service = service
         setupSearchText()
     }
     

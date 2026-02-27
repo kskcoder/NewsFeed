@@ -7,13 +7,17 @@
 
 import Foundation
 
+protocol NewsServiceProtocol {
+    func fetchNews() async throws -> [News]
+}
+
 enum NetworkError: Error {
     case invalidUrl
     case invalidResponse
     case decodingError
 }
 
-final class NewsService {
+final class NewsService: NewsServiceProtocol {
     
     func fetchNews() async throws -> [News] {
         guard let url = URL(string: "https://jsonplaceholder.typicode.com/posts") else {

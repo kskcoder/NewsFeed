@@ -7,8 +7,9 @@
 
 import SwiftUI
 
+@MainActor
 struct NewsListView: View {
-    @StateObject private var viewModel = NewsViewModel()
+    @StateObject private var viewModel = NewsViewModel(service: NewsService())
     @Environment(\.scenePhase) private var scenePhase
     
     var body: some View {
@@ -39,42 +40,16 @@ struct NewsListView: View {
             EmptyView()
         
         case .loading:
-            ProgressView()
+            LoadingView()
             
         case .loaded(let newsList):
-            ScrollViewReader { proxy in
-                ScrollView {
-                    Color(.clear)
-                        .foregroundColor(Color.red)
-                        .id("TOP")
-                    
-                    LazyVStack {
-                        ForEach (newsList) { newsItem in
-                            NavigationLink(value: newsItem) {
-                                NewsRow(news: newsItem,
-                                        viewModel: viewModel)
-                            }
-                        }
-                    }
-                    Button("Scroll To Top") {
-                        proxy.scrollTo("TOP", anchor: .top)
-                    }
-                    .buttonStyle(.plain)
-                }
-            }
-            .navigationDestination(for: News.self) { news in
-                NewsDetailView(news: news)
-            }
+            RowView(viewModel: viewModel,
+                    newsList: newsList)
             
         case .error(let errorMessage):
-            VStack {
-                Text(errorMessage)
-                    .multilineTextAlignment(.center)
-                
-                Button("Retry") {
-                    Task {
-                        await viewModel.fetchNews()
-                    }
+            ErrorView(errorMessage: errorMessage) {
+                Task {
+                    await viewModel.fetchNews()
                 }
             }
         }
